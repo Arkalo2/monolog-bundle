@@ -4,4 +4,4 @@
 
 * Drop support for PHP < 8.2
 * Drop support for Symfony < 7.3
-* Drop support for Monolog < 3.0
+* Drop support for Monolog < 3.5

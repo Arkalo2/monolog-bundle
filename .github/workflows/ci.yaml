@@ -33,6 +33,7 @@ jobs:
                 include:
                     -   php: '8.2'
                         deps: lowest
+                        monolog: ''
                         deprecations: max[self]=0
                     -   php: '8.4'
                         deps: highest

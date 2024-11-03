@@ -15,7 +15,6 @@ use Monolog\Attribute\AsMonologProcessor;
 use Monolog\Attribute\WithMonologChannel;
 use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
 use Monolog\Handler\HandlerInterface;
-use Monolog\Logger;
 use Monolog\Processor\ProcessorInterface;
 use Monolog\Processor\PsrLogMessageProcessor;
 use Monolog\ResettableInterface;
@@ -47,8 +46,6 @@ class MonologExtension extends Extension
 {
     private $nestedHandlers = [];
 
-    private $swiftMailerHandlers = [];
-
     /**
      * Loads the Monolog configuration.
      *
@@ -78,11 +75,6 @@ class MonologExtension extends Extension
                     'channels' => empty($handler['channels']) ? null : $handler['channels'],
                 ];
             }
-
-            $container->setParameter(
-                'monolog.swift_mailer.handlers',
-                $this->swiftMailerHandlers
-            );
 
             ksort($handlers);
             $sortedHandlers = [];
@@ -231,14 +223,6 @@ class MonologExtension extends Extension
                     $publisher = new Definition('Gelf\Publisher', []);
                     $publisher->addMethodCall('addTransport', [$transport]);
                     $publisher->setPublic(false);
-                } elseif (class_exists('Gelf\MessagePublisher')) {
-                    $publisher = new Definition('Gelf\MessagePublisher', [
-                        $handler['publisher']['hostname'],
-                        $handler['publisher']['port'],
-                        $handler['publisher']['chunk_size'],
-                    ]);
-
-                    $publisher->setPublic(false);
                 } else {
                     throw new \RuntimeException('The gelf handler requires the graylog2/gelf-php package to be installed');
                 }
@@ -336,10 +320,6 @@ class MonologExtension extends Extension
                 break;
 
             case 'telegram':
-                if (!class_exists('Monolog\Handler\TelegramBotHandler')) {
-                    throw new \RuntimeException('The TelegramBotHandler is not available. Please update "monolog/monolog" to 2.2.0');
-                }
-
                 $definition->setArguments([
                     $handler['token'],
                     $handler['channel'],
@@ -527,43 +507,6 @@ class MonologExtension extends Extension
                 }
                 break;
 
-            case 'swift_mailer':
-                $mailer = $handler['mailer'] ?: 'mailer';
-                if (isset($handler['email_prototype'])) {
-                    if (!empty($handler['email_prototype']['method'])) {
-                        $prototype = [new Reference($handler['email_prototype']['id']), $handler['email_prototype']['method']];
-                    } else {
-                        $prototype = new Reference($handler['email_prototype']['id']);
-                    }
-                } else {
-                    $messageFactory = new Definition('Symfony\Bundle\MonologBundle\SwiftMailer\MessageFactory');
-                    $messageFactory->setLazy(true);
-                    $messageFactory->setPublic(false);
-                    $messageFactory->setArguments([
-                        new Reference($mailer),
-                        $handler['from_email'],
-                        $handler['to_email'],
-                        $handler['subject'],
-                        $handler['content_type'],
-                    ]);
-
-                    $messageFactoryId = \sprintf('%s.mail_message_factory', $handlerId);
-                    $container->setDefinition($messageFactoryId, $messageFactory);
-                    // set the prototype as a callable
-                    $prototype = [new Reference($messageFactoryId), 'createMessage'];
-                }
-                $definition->setArguments([
-                    new Reference($mailer),
-                    $prototype,
-                    $handler['level'],
-                    $handler['bubble'],
-                ]);
-
-                $this->swiftMailerHandlers[] = $handlerId;
-                $definition->addTag('kernel.event_listener', ['event' => 'kernel.terminate', 'method' => 'onKernelTerminate']);
-                $definition->addTag('kernel.event_listener', ['event' => 'console.terminate', 'method' => 'onCliTerminate']);
-                break;
-
             case 'native_mailer':
                 $definition->setArguments([
                     $handler['to_email'],
@@ -633,27 +576,6 @@ class MonologExtension extends Extension
                 }
                 break;
 
-            case 'hipchat':
-                $definition->setArguments([
-                    $handler['token'],
-                    $handler['room'],
-                    $handler['nickname'],
-                    $handler['notify'],
-                    $handler['level'],
-                    $handler['bubble'],
-                    $handler['use_ssl'],
-                    $handler['message_format'],
-                    !empty($handler['host']) ? $handler['host'] : 'api.hipchat.com',
-                    !empty($handler['api_version']) ? $handler['api_version'] : 'v1',
-                ]);
-                if (isset($handler['timeout'])) {
-                    $definition->addMethodCall('setTimeout', [$handler['timeout']]);
-                }
-                if (isset($handler['connection_timeout'])) {
-                    $definition->addMethodCall('setConnectionTimeout', [$handler['connection_timeout']]);
-                }
-                break;
-
             case 'slack':
                 $definition->setArguments([
                     $handler['token'],
@@ -683,16 +605,6 @@ class MonologExtension extends Extension
                     $handler['icon_emoji'],
                     $handler['use_short_attachment'],
                     $handler['include_extra'],
-                    $handler['level'],
-                    $handler['bubble'],
-                ]);
-                break;
-
-            case 'slackbot':
-                $definition->setArguments([
-                    $handler['team'],
-                    $handler['token'],
-                    urlencode($handler['channel']),
                     $handler['level'],
                     $handler['bubble'],
                 ]);
@@ -772,31 +684,6 @@ class MonologExtension extends Extension
                     $handler['bubble'],
                     $handler['fill_extra_context'],
                 ]);
-                break;
-
-            case 'raven':
-                if (null !== $handler['client_id']) {
-                    $clientId = $handler['client_id'];
-                } else {
-                    $client = new Definition('Raven_Client', [
-                        $handler['dsn'],
-                        [
-                            'auto_log_stacks' => $handler['auto_log_stacks'],
-                            'environment' => $handler['environment'],
-                        ],
-                    ]);
-                    $client->setPublic(false);
-                    $clientId = 'monolog.raven.client.'.sha1($handler['dsn']);
-                    $container->setDefinition($clientId, $client);
-                }
-                $definition->setArguments([
-                    new Reference($clientId),
-                    $handler['level'],
-                    $handler['bubble'],
-                ]);
-                if (!empty($handler['release'])) {
-                    $definition->addMethodCall('setRelease', [$handler['release']]);
-                }
                 break;
 
             case 'loggly':
@@ -971,18 +858,14 @@ class MonologExtension extends Extension
             'firephp' => 'Symfony\Bridge\Monolog\Handler\FirePHPHandler',
             'chromephp' => 'Symfony\Bridge\Monolog\Handler\ChromePhpHandler',
             'debug' => 'Symfony\Bridge\Monolog\Handler\DebugHandler',
-            'swift_mailer' => 'Symfony\Bridge\Monolog\Handler\SwiftMailerHandler',
             'native_mailer' => 'Monolog\Handler\NativeMailerHandler',
             'symfony_mailer' => 'Symfony\Bridge\Monolog\Handler\MailerHandler',
             'socket' => 'Monolog\Handler\SocketHandler',
             'pushover' => 'Monolog\Handler\PushoverHandler',
-            'raven' => 'Monolog\Handler\RavenHandler',
             'sentry' => 'Sentry\Monolog\Handler',
             'newrelic' => 'Monolog\Handler\NewRelicHandler',
-            'hipchat' => 'Monolog\Handler\HipChatHandler',
             'slack' => 'Monolog\Handler\SlackHandler',
             'slackwebhook' => 'Monolog\Handler\SlackWebhookHandler',
-            'slackbot' => 'Monolog\Handler\SlackbotHandler',
             'cube' => 'Monolog\Handler\CubeHandler',
             'amqp' => 'Monolog\Handler\AmqpHandler',
             'error_log' => 'Monolog\Handler\ErrorLogHandler',
@@ -992,16 +875,12 @@ class MonologExtension extends Extension
             'fingers_crossed' => 'Monolog\Handler\FingersCrossedHandler',
             'filter' => 'Monolog\Handler\FilterHandler',
             'mongo' => 'Monolog\Handler\MongoDBHandler',
-            'elasticsearch' => 'Monolog\Handler\ElasticSearchHandler',
             'telegram' => 'Monolog\Handler\TelegramBotHandler',
             'server_log' => 'Symfony\Bridge\Monolog\Handler\ServerLogHandler',
             'redis' => 'Monolog\Handler\RedisHandler',
             'predis' => 'Monolog\Handler\RedisHandler',
             'insightops' => 'Monolog\Handler\InsightOpsHandler',
             'sampling' => 'Monolog\Handler\SamplingHandler',
-        ];
-
-        $v2HandlerTypesAdded = [
             'elastica' => 'Monolog\Handler\ElasticaHandler',
             'elasticsearch' => 'Monolog\Handler\ElasticaHandler',
             'elastic_search' => 'Monolog\Handler\ElasticsearchHandler',
@@ -1009,42 +888,7 @@ class MonologExtension extends Extension
             'noop' => 'Monolog\Handler\NoopHandler',
         ];
 
-        $v2HandlerTypesRemoved = [
-            'hipchat',
-            'raven',
-            'slackbot',
-        ];
-
-        $v3HandlerTypesRemoved = [
-            'swift_mailer',
-        ];
-
-        if (Logger::API >= 2) {
-            $typeToClassMapping = array_merge($typeToClassMapping, $v2HandlerTypesAdded);
-            foreach ($v2HandlerTypesRemoved as $v2HandlerTypeRemoved) {
-                unset($typeToClassMapping[$v2HandlerTypeRemoved]);
-            }
-        }
-
-        if (Logger::API >= 3) {
-            foreach ($v3HandlerTypesRemoved as $v3HandlerTypeRemoved) {
-                unset($typeToClassMapping[$v3HandlerTypeRemoved]);
-            }
-        }
-
         if (!isset($typeToClassMapping[$handlerType])) {
-            if (Logger::API === 1 && \array_key_exists($handlerType, $v2HandlerTypesAdded)) {
-                throw new \InvalidArgumentException(\sprintf('"%s" was added in Monolog v2, please upgrade if you wish to use it.', $handlerType));
-            }
-
-            if (Logger::API >= 2 && \array_key_exists($handlerType, $v2HandlerTypesRemoved)) {
-                throw new \InvalidArgumentException(\sprintf('"%s" was removed in Monolog v2.', $handlerType));
-            }
-
-            if (Logger::API >= 3 && \array_key_exists($handlerType, $v3HandlerTypesRemoved)) {
-                throw new \InvalidArgumentException(\sprintf('"%s" was removed in Monolog v3.', $handlerType));
-            }
-
             throw new \InvalidArgumentException(\sprintf('There is no handler class defined for handler "%s".', $handlerType));
         }
 

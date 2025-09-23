@@ -1,5 +1,10 @@
 ## Unreleased
 
+## 3.11.0 unreleased
+
+* Reorganize files to match the "Reusable Bundles" structure
+* Migrate services configuration to PHP
+
 ## 3.10.0 (2023-11-06)
 
 * Add configuration support for SamplingHandler

@@ -147,7 +147,7 @@ class LoggerChannelPassTest extends TestCase
     private function getContainer()
     {
         $container = new ContainerBuilder();
-        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../Resources/config'));
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../config'));
         $loader->load('monolog.php');
         $definition = $container->getDefinition('monolog.logger_prototype');
         $container->set('monolog.handler.test', new Definition('%monolog.handler.null.class%', [100, false]));
@@ -189,7 +189,7 @@ class LoggerChannelPassTest extends TestCase
     private function getContainerWithSetter()
     {
         $container = new ContainerBuilder();
-        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../Resources/config'));
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../config'));
         $loader->load('monolog.php');
         $definition = $container->getDefinition('monolog.logger_prototype');
         $container->set('monolog.handler.test', new Definition('%monolog.handler.null.class%', [100, false]));
@@ -222,7 +222,7 @@ class LoggerChannelPassTest extends TestCase
         $container->setParameter('monolog.handlers_to_channels', []);
         $container->setParameter('monolog.use_microseconds', true);
 
-        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../Resources/config'));
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../config'));
         $loader->load('monolog.php');
 
         $container->addCompilerPass(new LoggerChannelPass());

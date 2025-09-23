@@ -61,7 +61,7 @@ class MonologExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         if (isset($config['handlers'])) {
-            $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+            $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../config'));
             $loader->load('monolog.php');
 
             if (!class_exists(DebugLoggerConfigurator::class)) {
@@ -149,7 +149,7 @@ class MonologExtension extends Extension
      */
     public function getXsdValidationBasePath()
     {
-        return __DIR__.'/../Resources/config/schema';
+        return __DIR__.'/../../config/schema';
     }
 
     public function getNamespace()

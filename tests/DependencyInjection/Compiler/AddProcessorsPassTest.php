@@ -42,7 +42,7 @@ class AddProcessorsPassTest extends TestCase
     public function testFailureOnHandlerWithoutPushProcessor()
     {
         $container = new ContainerBuilder();
-        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../Resources/config'));
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../config'));
         $loader->load('monolog.php');
 
         $service = new Definition(NullHandler::class);
@@ -68,7 +68,7 @@ class AddProcessorsPassTest extends TestCase
     protected function getContainer()
     {
         $container = new ContainerBuilder();
-        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../Resources/config'));
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../config'));
         $loader->load('monolog.php');
 
         $definition = $container->getDefinition('monolog.logger_prototype');

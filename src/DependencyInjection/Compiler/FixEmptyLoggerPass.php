@@ -33,14 +33,12 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class FixEmptyLoggerPass implements CompilerPassInterface
 {
-    private $channelPass;
-
-    public function __construct(LoggerChannelPass $channelPass)
-    {
-        $this->channelPass = $channelPass;
+    public function __construct(
+        private LoggerChannelPass $channelPass,
+    ) {
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $container->register('monolog.handler.null_internal', 'Monolog\Handler\NullHandler');
         foreach ($this->channelPass->getChannels() as $channel) {

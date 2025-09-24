@@ -39,7 +39,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class MonologExtension extends Extension
 {
-    private $nestedHandlers = [];
+    /** @var list<string> */
+    private array $nestedHandlers = [];
 
     /**
      * Loads the Monolog configuration.
@@ -47,7 +48,7 @@ final class MonologExtension extends Extension
      * @param array            $configs   An array of configuration settings
      * @param ContainerBuilder $container A ContainerBuilder instance
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
@@ -117,22 +118,17 @@ final class MonologExtension extends Extension
         });
     }
 
-    /**
-     * Returns the base path for the XSD files.
-     *
-     * @return string The XSD base path
-     */
-    public function getXsdValidationBasePath()
+    public function getXsdValidationBasePath(): string
     {
         return __DIR__.'/../../config/schema';
     }
 
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return 'http://symfony.com/schema/dic/monolog';
     }
 
-    private function buildHandler(ContainerBuilder $container, $name, array $handler)
+    private function buildHandler(ContainerBuilder $container, string $name, array $handler): string
     {
         $handlerId = $this->getHandlerId($name);
         if ('service' === $handler['type']) {
@@ -809,23 +805,23 @@ final class MonologExtension extends Extension
         return $handlerId;
     }
 
-    private function markNestedHandler($nestedHandlerId)
+    private function markNestedHandler(string $nestedHandlerId): void
     {
-        if (\in_array($nestedHandlerId, $this->nestedHandlers)) {
+        if (\in_array($nestedHandlerId, $this->nestedHandlers, true)) {
             return;
         }
 
         $this->nestedHandlers[] = $nestedHandlerId;
     }
 
-    private function getHandlerId($name)
+    private function getHandlerId(string $name): string
     {
         return \sprintf('monolog.handler.%s', $name);
     }
 
-    private function getHandlerClassByType($handlerType)
+    private function getHandlerClassByType(string $handlerType): string
     {
-        $typeToClassMapping = [
+        return match ($handlerType) {
             'stream' => 'Monolog\Handler\StreamHandler',
             'console' => 'Symfony\Bridge\Monolog\Handler\ConsoleHandler',
             'group' => 'Monolog\Handler\GroupHandler',
@@ -862,22 +858,15 @@ final class MonologExtension extends Extension
             'mongo' => 'Monolog\Handler\MongoDBHandler',
             'telegram' => 'Monolog\Handler\TelegramBotHandler',
             'server_log' => 'Symfony\Bridge\Monolog\Handler\ServerLogHandler',
-            'redis' => 'Monolog\Handler\RedisHandler',
-            'predis' => 'Monolog\Handler\RedisHandler',
+            'redis', 'predis' => 'Monolog\Handler\RedisHandler',
             'insightops' => 'Monolog\Handler\InsightOpsHandler',
             'sampling' => 'Monolog\Handler\SamplingHandler',
-            'elastica' => 'Monolog\Handler\ElasticaHandler',
-            'elasticsearch' => 'Monolog\Handler\ElasticaHandler',
+            'elastica', 'elasticsearch' => 'Monolog\Handler\ElasticaHandler',
             'elastic_search' => 'Monolog\Handler\ElasticsearchHandler',
             'fallbackgroup' => 'Monolog\Handler\FallbackGroupHandler',
             'noop' => 'Monolog\Handler\NoopHandler',
-        ];
-
-        if (!isset($typeToClassMapping[$handlerType])) {
-            throw new \InvalidArgumentException(\sprintf('There is no handler class defined for handler "%s".', $handlerType));
-        }
-
-        return $typeToClassMapping[$handlerType];
+            default => throw new \InvalidArgumentException(\sprintf('There is no handler class defined for handler "%s".', $handlerType)),
+        };
     }
 
     private function buildPsrLogMessageProcessor(ContainerBuilder $container, array $processorOptions): string

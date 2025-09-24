@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\MonologBundle\Tests\DependencyInjection\Compiler;
 
 use Monolog\Handler\NullHandler;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\ConsoleHandler;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\AddProcessorsPass;
@@ -60,9 +61,7 @@ class AddProcessorsPassTest extends TestCase
         $container->compile();
     }
 
-    /**
-     * @dataProvider provideEmptyTagsData
-     */
+    #[DataProvider('provideEmptyTagsData')]
     public function testEmptyTagsAreIgnoredWhenNonEmptyArePresent(array $tagAttributesList, array $expectedLoggerCalls, array $expectedMyChannelLoggerCalls)
     {
         $container = new ContainerBuilder();

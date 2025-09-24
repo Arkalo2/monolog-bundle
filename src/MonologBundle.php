@@ -22,10 +22,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
  * @author Jordi Boggiano <j.boggiano@seld.be>
- *
- * @final since 3.9.0
  */
-class MonologBundle extends Bundle
+final class MonologBundle extends Bundle
 {
     /**
      * @return void

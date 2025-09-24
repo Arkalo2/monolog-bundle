@@ -216,7 +216,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
  *
  * - sentry:
  *   - dsn: connection string
- *   - client_id: Raven client custom service id (optional)
+ *   - client_id: Sentry client custom service id (optional)
  *   - hub_id: Sentry hub custom service id (optional)
  *   - [release]: release number of the application that will be attached to logs, defaults to null
  *   - [level]: level name or int value, defaults to DEBUG
@@ -343,10 +343,8 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
  *
  * @author Jordi Boggiano <j.boggiano@seld.be>
  * @author Christophe Coevoet <stof@notk.org>
- *
- * @final since 3.9.0
  */
-class Configuration implements ConfigurationInterface
+final class Configuration implements ConfigurationInterface
 {
     /**
      * Generates the configuration tree builder.

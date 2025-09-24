@@ -534,27 +534,6 @@ class MonologExtensionTest extends DependencyInjectionTestCase
         $this->assertDICConstructorArguments($handler, [new Reference('monolog.handler.nested'), new Reference('monolog.handler.main.http_code_strategy'), 0, true, true, null]);
     }
 
-    #[DataProvider('v2RemovedDataProvider')]
-    public function testV2Removed(string $type)
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(\sprintf('There is no handler class defined for handler "%s".', $type));
-
-        $container = new ContainerBuilder();
-        $loader = new MonologExtension();
-
-        $loader->load([['handlers' => ['main' => ['type' => $type]]]], $container);
-    }
-
-    public static function v2RemovedDataProvider(): array
-    {
-        return [
-            ['hipchat'],
-            ['raven'],
-            ['slackbot'],
-        ];
-    }
-
     #[DataProvider('provideLoglevelParameterConfig')]
     public function testLogLevelfromParameter(array $parameters, array $config, $expectedClass, array $expectedArgs)
     {

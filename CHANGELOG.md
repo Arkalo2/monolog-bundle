@@ -4,6 +4,7 @@
 
 * Reorganize files to match the "Reusable Bundles" structure
 * Migrate services configuration to PHP
+* Add `console.interactive_only` flag
 
 ## 3.10.0 (2023-11-06)
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\MonologBundle\DependencyInjection;
 
+use Composer\InstalledVersions;
 use Monolog\Logger;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -40,6 +41,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
  *   - [level]: level name or int value, defaults to DEBUG
  *   - [bubble]: bool, defaults to true
  *   - [console_formatter_options]: array
+ *   - [interactive_only]: bool, defaults to false
  *
  * - firephp:
  *   - [level]: level name or int value, defaults to DEBUG
@@ -63,7 +65,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
  *   - [max_files]: files to keep, defaults to zero (infinite)
  *   - [level]: level name or int value, defaults to DEBUG
  *   - [bubble]: bool, defaults to true
- *   - [file_permission]: string|null, defaults to null
+ *   - [file_permission]: int|null, defaults to null (0o644)
  *   - [use_locking]: bool, defaults to false
  *   - [filename_format]: string, defaults to '{filename}-{date}'
  *   - [date_format]: string, defaults to 'Y-m-d'
@@ -448,6 +450,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('priority')->defaultValue(0)->end()
                 ->scalarNode('level')->defaultValue('DEBUG')->end()
                 ->booleanNode('bubble')->defaultTrue()->end()
+                ->booleanNode('interactive_only')->defaultFalse()->end()
                 ->scalarNode('app_name')->defaultNull()->end()
                 ->booleanNode('fill_extra_context')->defaultFalse()->end() // sentry
                 ->booleanNode('include_stacktraces')->defaultFalse()->end()
@@ -795,6 +798,10 @@ class Configuration implements ConfigurationInterface
             ->validate()
                 ->ifTrue(function ($v) { return 'server_log' === $v['type'] && empty($v['host']); })
                 ->thenInvalid('The host has to be specified to use a ServerLogHandler')
+            ->end()
+            ->validate()
+                ->ifTrue(function ($v) { return $v['interactive_only'] && version_compare(InstalledVersions::getVersion('symfony/monolog-bridge'), '7.4.0', '<'); })
+                ->thenInvalid('The interactive_only flag requires symfony/monolog-bridge 7.4 or higher')
             ->end()
         ;
 

@@ -25,10 +25,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 final class MonologBundle extends Bundle
 {
-    /**
-     * @return void
-     */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
@@ -39,10 +36,8 @@ final class MonologBundle extends Bundle
 
     /**
      * @internal
-     *
-     * @return void
      */
-    public static function includeStacktraces(HandlerInterface $handler)
+    public static function includeStacktraces(HandlerInterface $handler): void
     {
         $formatter = $handler->getFormatter();
         if ($formatter instanceof LineFormatter || $formatter instanceof JsonFormatter) {

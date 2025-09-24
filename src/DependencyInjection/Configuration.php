@@ -751,7 +751,7 @@ final class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    private function addGelfSection(ArrayNodeDefinition $handlerNode)
+    private function addGelfSection(ArrayNodeDefinition $handlerNode): void
     {
         $handlerNode
             ->children()
@@ -782,7 +782,7 @@ final class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addMongoSection(ArrayNodeDefinition $handlerNode)
+    private function addMongoSection(ArrayNodeDefinition $handlerNode): void
     {
         $handlerNode
             ->children()
@@ -822,7 +822,7 @@ final class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addElasticsearchSection(ArrayNodeDefinition $handlerNode)
+    private function addElasticsearchSection(ArrayNodeDefinition $handlerNode): void
     {
         $handlerNode
             ->children()
@@ -854,7 +854,7 @@ final class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addRedisSection(ArrayNodeDefinition $handlerNode)
+    private function addRedisSection(ArrayNodeDefinition $handlerNode): void
     {
         $handlerNode
             ->children()
@@ -887,7 +887,7 @@ final class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addPredisSection(ArrayNodeDefinition $handlerNode)
+    private function addPredisSection(ArrayNodeDefinition $handlerNode): void
     {
         $handlerNode
             ->children()
@@ -916,7 +916,7 @@ final class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addMailerSection(ArrayNodeDefinition $handlerNode)
+    private function addMailerSection(ArrayNodeDefinition $handlerNode): void
     {
         $handlerNode
             ->children()
@@ -958,7 +958,7 @@ final class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addVerbosityLevelSection(ArrayNodeDefinition $handlerNode)
+    private function addVerbosityLevelSection(ArrayNodeDefinition $handlerNode): void
     {
         $handlerNode
             ->children()
@@ -1014,7 +1014,7 @@ final class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addChannelsSection(ArrayNodeDefinition $handlerNode)
+    private function addChannelsSection(ArrayNodeDefinition $handlerNode): void
     {
         $handlerNode
             ->children()

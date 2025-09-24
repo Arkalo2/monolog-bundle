@@ -28,9 +28,10 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class LoggerChannelPass implements CompilerPassInterface
 {
-    protected $channels = ['app'];
+    /** @var list<string> */
+    protected array $channels = ['app'];
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('monolog.logger')) {
             return;
@@ -106,17 +107,14 @@ class LoggerChannelPass implements CompilerPassInterface
     }
 
     /**
-     * @return array
+     * @return list<string>
      */
-    public function getChannels()
+    public function getChannels(): array
     {
         return $this->channels;
     }
 
-    /**
-     * @return array
-     */
-    protected function processChannels(?array $configuration)
+    protected function processChannels(?array $configuration): array
     {
         if (null === $configuration) {
             return $this->channels;
@@ -131,12 +129,10 @@ class LoggerChannelPass implements CompilerPassInterface
 
     /**
      * Create new logger from the monolog.logger_prototype.
-     *
-     * @return void
      */
-    protected function createLogger(string $channel, string $loggerId, ContainerBuilder $container)
+    protected function createLogger(string $channel, string $loggerId, ContainerBuilder $container): void
     {
-        if (!\in_array($channel, $this->channels)) {
+        if (!\in_array($channel, $this->channels, true)) {
             $logger = new ChildDefinition('monolog.logger_prototype');
             $logger->replaceArgument(0, $channel);
             $container->setDefinition($loggerId, $logger);

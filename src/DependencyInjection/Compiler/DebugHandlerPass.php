@@ -27,16 +27,13 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class DebugHandlerPass implements CompilerPassInterface
 {
-    private $channelPass;
-
-    public function __construct(LoggerChannelPass $channelPass)
-    {
+    public function __construct(
+        private LoggerChannelPass $channelPass,
+    ) {
         @trigger_error('The '.__CLASS__.' class is deprecated since version 2.12 and will be removed in 4.0. Use AddDebugLogProcessorPass in FrameworkBundle instead.', \E_USER_DEPRECATED);
-
-        $this->channelPass = $channelPass;
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('profiler')) {
             return;

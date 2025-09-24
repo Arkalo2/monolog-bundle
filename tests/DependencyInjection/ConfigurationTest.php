@@ -190,40 +190,6 @@ class ConfigurationTest extends TestCase
         $config = $this->process($configs);
     }
 
-    /** @group legacy */
-    public function testWithSwiftMailerHandler()
-    {
-        if (Logger::API >= 3) {
-            $this->markTestSkipped('This test requires Monolog v1 or v2');
-        }
-
-        $configs = [
-            [
-                'handlers' => [
-                    'swift' => [
-                        'type' => 'swift_mailer',
-                        'from_email' => 'foo@bar.com',
-                        'to_email' => 'foo@bar.com',
-                        'subject' => 'Subject',
-                        'mailer' => 'mailer',
-                        'email_prototype' => [
-                            'id' => 'monolog.prototype',
-                            'method' => 'getPrototype',
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        $config = $this->process($configs);
-
-        // Check email_prototype
-        $this->assertCount(2, $config['handlers']['swift']['email_prototype']);
-        $this->assertEquals('monolog.prototype', $config['handlers']['swift']['email_prototype']['id']);
-        $this->assertEquals('getPrototype', $config['handlers']['swift']['email_prototype']['method']);
-        $this->assertEquals('mailer', $config['handlers']['swift']['mailer']);
-    }
-
     public function testWithElasticsearchHandler()
     {
         $configs = [

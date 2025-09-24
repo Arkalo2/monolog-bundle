@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\MonologBundle\Tests\DependencyInjection;
 
 use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
-use Monolog\Processor\PsrLogMessageProcessor;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\LoggerChannelPass;
 use Symfony\Bundle\MonologBundle\DependencyInjection\MonologExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -145,24 +144,6 @@ abstract class FixtureMonologExtensionTestCase extends DependencyInjectionTestCa
         );
     }
 
-    /** @group legacy */
-    public function testSingleEmailRecipient()
-    {
-        if (\Monolog\Logger::API >= 3) {
-            $this->markTestSkipped('This test requires Monolog v1 or v2');
-        }
-
-        $container = $this->getContainer('single_email_recipient');
-
-        $this->assertEquals([
-            new Reference('mailer'),
-            'error@example.com', // from
-            ['error@example.com'], // to
-            'An Error Occurred!', // subject
-            null,
-        ], $container->getDefinition('monolog.handler.swift.mail_message_factory')->getArguments());
-    }
-
     public function testServerLog()
     {
         $container = $this->getContainer('server_log');
@@ -172,23 +153,6 @@ abstract class FixtureMonologExtensionTestCase extends DependencyInjectionTestCa
             'DEBUG',
             true,
         ], $container->getDefinition('monolog.handler.server_log')->getArguments());
-    }
-
-    public function testMultipleEmailRecipients()
-    {
-        if (\Monolog\Logger::API >= 3) {
-            $this->markTestSkipped('This test requires Monolog v1 or v2');
-        }
-
-        $container = $this->getContainer('multiple_email_recipients');
-
-        $this->assertEquals([
-            new Reference('mailer'),
-            'error@example.com',
-            ['dev1@example.com', 'dev2@example.com'],
-            'An Error Occurred!',
-            null,
-        ], $container->getDefinition('monolog.handler.swift.mail_message_factory')->getArguments());
     }
 
     public function testChannelParametersResolved()
@@ -216,9 +180,6 @@ abstract class FixtureMonologExtensionTestCase extends DependencyInjectionTestCa
 
     public function testPsr3MessageProcessingDisabledOnNullHandler()
     {
-        if (\Monolog\Logger::API < 2) {
-            $this->markTestSkipped('This test requires Monolog v2 or above');
-        }
         $container = $this->getContainer('process_psr_3_messages_null');
 
         $logger = $container->getDefinition('monolog.handler.custom');
@@ -230,9 +191,6 @@ abstract class FixtureMonologExtensionTestCase extends DependencyInjectionTestCa
 
     public function testHandlersV2()
     {
-        if (\Monolog\Logger::API < 2) {
-            $this->markTestSkipped('This test requires Monolog v2 or above');
-        }
         $this->getContainer('handlers');
 
         $this->expectNotToPerformAssertions();
@@ -251,11 +209,6 @@ abstract class FixtureMonologExtensionTestCase extends DependencyInjectionTestCa
 
     public function testPsrLogMessageProcessorHasConstructorArguments(): void
     {
-        $reflectionConstructor = (new \ReflectionClass(PsrLogMessageProcessor::class))->getConstructor();
-        if (null === $reflectionConstructor || $reflectionConstructor->getNumberOfParameters() <= 0) {
-            $this->markTestSkipped('Monolog >= 1.26 is needed.');
-        }
-
         $container = $this->getContainer('process_psr_3_messages_with_arguments');
 
         $processors = [
@@ -274,28 +227,6 @@ abstract class FixtureMonologExtensionTestCase extends DependencyInjectionTestCa
             $handler = $container->getDefinition($handlerId);
             $this->assertDICDefinitionMethodCallAt(0, $handler, 'pushProcessor', [new Reference($processorId)]);
         }
-    }
-
-    public function testPsrLogMessageProcessorDoesNotHaveConstructorArguments(): void
-    {
-        $reflectionConstructor = (new \ReflectionClass(PsrLogMessageProcessor::class))->getConstructor();
-        if (null !== $reflectionConstructor && $reflectionConstructor->getNumberOfParameters() > 0) {
-            $this->markTestSkipped('Monolog < 1.26 is needed.');
-        }
-
-        $container = $this->getContainer('process_psr_3_messages_without_arguments');
-
-        $this->assertTrue($container->hasDefinition($processorId = 'monolog.processor.psr_log_message'));
-        $processor = $container->getDefinition($processorId);
-        $this->assertDICConstructorArguments($processor, []);
-
-        $this->assertTrue($container->hasDefinition($handlerId = 'monolog.handler.without_arguments'));
-        $handler = $container->getDefinition($handlerId);
-        $this->assertDICDefinitionMethodCallAt(0, $handler, 'pushProcessor', [new Reference($processorId)]);
-
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Monolog 1.26 or higher is required for the "date_format" and "remove_used_context_fields" options to be used.');
-        $this->getContainer('process_psr_3_messages_with_arguments');
     }
 
     public function testNativeMailer()

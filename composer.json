@@ -16,20 +16,18 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.2",
         "composer-runtime-api": "^2.0",
-        "monolog/monolog": "^1.25.1 || ^2.0 || ^3.0",
-        "symfony/monolog-bridge": "^5.4 || ^6.0 || ^7.0",
-        "symfony/dependency-injection": "^5.4 || ^6.0 || ^7.0",
-        "symfony/config": "^5.4 || ^6.0 || ^7.0",
-        "symfony/dependency-injection": "^5.4 || ^6.0 || ^7.0",
-        "symfony/http-kernel": "^5.4 || ^6.0 || ^7.0",
-        "symfony/monolog-bridge": "^5.4 || ^6.0 || ^7.0"
+        "monolog/monolog": "^3.0",
+        "symfony/config": "^7.3",
+        "symfony/dependency-injection": "^7.3",
+        "symfony/http-kernel": "^7.3",
+        "symfony/monolog-bridge": "^7.3"
     },
     "require-dev": {
-        "symfony/console": "^5.4 || ^6.0 || ^7.0",
-        "symfony/phpunit-bridge": "^7.1",
-        "symfony/yaml": "^5.4 || ^6.0 || ^7.0"
+        "symfony/console": "^7.3",
+        "symfony/phpunit-bridge": "^7.3",
+        "symfony/yaml": "^7.3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\MonologBundle\\": "src" }

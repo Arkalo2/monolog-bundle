@@ -6,6 +6,7 @@
 * Migrate services configuration to PHP
 * Add `console.interactive_only` flag
 * Add `slack.exclude_fields` and `slackwebhook.exclude_fields` configuration
+* Add a processor to all loggers only when tags do not specify a channel or handler
 
 ## 3.10.0 (2023-11-06)
 

@@ -34,7 +34,6 @@ jobs:
                     -   php: '8.2'
                         deps: lowest
                         symfony: '7.3.*'
-                        deprecations: max[self]=0
                     -   php: '8.4'
                         deps: highest
                         symfony: '7.4.*'
@@ -62,10 +61,5 @@ jobs:
                 with:
                     dependency-versions: '${{ matrix.deps }}'
 
-            -   name: Install PHPUnit dependencies
-                run: vendor/bin/simple-phpunit install
-
             -   name: Run tests
-                run: vendor/bin/simple-phpunit -v --coverage-text
-                env:
-                    SYMFONY_DEPRECATIONS_HELPER: '${{ matrix.deprecations }}'
+                run: vendor/bin/phpunit --coverage-text

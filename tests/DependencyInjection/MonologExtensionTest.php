@@ -14,6 +14,8 @@ namespace Symfony\Bundle\MonologBundle\Tests\DependencyInjection;
 use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
 use Monolog\Handler\RollbarHandler;
 use Monolog\Processor\UidProcessor;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\LoggerChannelPass;
 use Symfony\Bundle\MonologBundle\DependencyInjection\MonologExtension;
 use Symfony\Bundle\MonologBundle\Tests\DependencyInjection\Fixtures\AsMonologProcessor\FooProcessorWithPriority;
@@ -466,7 +468,7 @@ class MonologExtensionTest extends DependencyInjectionTestCase
         $this->assertDICDefinitionMethodCallAt(1, $handler, 'setTag', ['foo,bar']);
     }
 
-    /** @group legacy */
+    #[IgnoreDeprecations]
     public function testFingersCrossedHandlerWhenExcluded404sAreSpecified()
     {
         $activation = new Definition(ErrorLevelActivationStrategy::class, ['WARNING']);
@@ -532,9 +534,7 @@ class MonologExtensionTest extends DependencyInjectionTestCase
         $this->assertDICConstructorArguments($handler, [new Reference('monolog.handler.nested'), new Reference('monolog.handler.main.http_code_strategy'), 0, true, true, null]);
     }
 
-    /**
-     * @dataProvider v2RemovedDataProvider
-     */
+    #[DataProvider('v2RemovedDataProvider')]
     public function testV2Removed(string $type)
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -555,9 +555,7 @@ class MonologExtensionTest extends DependencyInjectionTestCase
         ];
     }
 
-    /**
-     * @dataProvider provideLoglevelParameterConfig
-     */
+    #[DataProvider('provideLoglevelParameterConfig')]
     public function testLogLevelfromParameter(array $parameters, array $config, $expectedClass, array $expectedArgs)
     {
         $container = new ContainerBuilder();
@@ -652,9 +650,6 @@ class MonologExtensionTest extends DependencyInjectionTestCase
         $this->assertEquals('reset', $tags['kernel.reset'][0]['method']);
     }
 
-    /**
-     * @requires PHP 8.0
-     */
     public function testAsMonologProcessorAutoconfigurationRedeclareMethod(): void
     {
         $this->expectException(\LogicException::class);
@@ -665,9 +660,6 @@ class MonologExtensionTest extends DependencyInjectionTestCase
         ]);
     }
 
-    /**
-     * @requires PHP 8.0
-     */
     public function testAsMonologProcessorAutoconfigurationWithPriority(): void
     {
         $container = $this->getContainer([], [
@@ -690,9 +682,6 @@ class MonologExtensionTest extends DependencyInjectionTestCase
         ], $container->getDefinition(FooProcessorWithPriority::class)->getTag('monolog.processor'));
     }
 
-    /**
-     * @requires PHP 8.0
-     */
     public function testWithLoggerChannelAutoconfiguration(): void
     {
         $container = $this->getContainer([], [
@@ -706,7 +695,7 @@ class MonologExtensionTest extends DependencyInjectionTestCase
         ], $container->getDefinition(ServiceWithChannel::class)->getTag('monolog.logger'));
     }
 
-    protected function getContainer(array $config = [], array $thirdPartyDefinitions = []): ContainerBuilder
+    private function getContainer(array $config = [], array $thirdPartyDefinitions = []): ContainerBuilder
     {
         $container = new ContainerBuilder(new EnvPlaceholderParameterBag());
         foreach ($thirdPartyDefinitions as $id => $definition) {

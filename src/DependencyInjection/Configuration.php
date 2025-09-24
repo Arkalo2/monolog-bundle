@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\MonologBundle\DependencyInjection;
 
 use Composer\InstalledVersions;
+use Monolog\Level;
 use Monolog\Logger;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -545,7 +546,7 @@ final class Configuration implements ConfigurationInterface
                 ->scalarNode('connection_string')->end() // socket_handler
                 ->scalarNode('timeout')->end() // socket_handler, logentries, pushover & slack
                 ->scalarNode('time')->defaultValue(60)->end() // deduplication
-                ->scalarNode('deduplication_level')->defaultValue(Logger::ERROR)->end() // deduplication
+                ->scalarNode('deduplication_level')->defaultValue(Level::Error->value)->end() // deduplication
                 ->scalarNode('store')->defaultNull()->end() // deduplication
                 ->scalarNode('connection_timeout')->end() // socket_handler, logentries, pushover & slack
                 ->booleanNode('persistent')->end() // socket_handler

@@ -520,6 +520,7 @@ class Configuration implements ConfigurationInterface
                     ->canBeUnset()
                     ->prototype('scalar')->end()
                 ->end() // slack & slackwebhook
+                ->scalarNode('token')->end() // pushover & loggly & logentries & flowdock & rollbar & slack & insightops & telegram
                 ->scalarNode('region')->end() // insightops
                 ->scalarNode('source')->end() // flowdock
                 ->booleanNode('use_ssl')->defaultTrue()->end() // logentries & insightops

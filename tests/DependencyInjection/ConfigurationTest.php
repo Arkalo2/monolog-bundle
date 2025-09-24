@@ -13,6 +13,8 @@ namespace Symfony\Bundle\MonologBundle\Tests\DependencyInjection;
 
 use Composer\InstalledVersions;
 use Monolog\Logger;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -50,10 +52,8 @@ class ConfigurationTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideProcessStringChannels
-     */
-    public function testProcessStringChannels($string, $expectedString, $isInclusive)
+    #[DataProvider('provideProcessStringChannels')]
+    public function testProcessStringChannels(string $string, string $expectedString, bool $isInclusive)
     {
         $configs = [
             [
@@ -88,10 +88,8 @@ class ConfigurationTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideGelfPublisher
-     */
-    public function testGelfPublisherService($publisher)
+    #[DataProvider('provideGelfPublisher')]
+    public function testGelfPublisherService(mixed $publisher)
     {
         $configs = [
             [
@@ -398,9 +396,7 @@ class ConfigurationTest extends TestCase
         $this->assertEquals('monolog_redis_test', $config['handlers']['redis']['redis']['key_name']);
     }
 
-    /**
-     * @group legacy
-     */
+    #[IgnoreDeprecations]
     public function testConsoleFormatterOptionsRename()
     {
         $configs = [
@@ -480,9 +476,7 @@ class ConfigurationTest extends TestCase
         $this->assertArrayNotHasKey('console_formater_options', $config['handlers']['both2']);
     }
 
-    /**
-     * @dataProvider processPsr3MessagesProvider
-     */
+    #[DataProvider('processPsr3MessagesProvider')]
     public function testWithProcessPsr3Messages(array $configuration, array $processedConfiguration): void
     {
         $configs = [
@@ -528,7 +522,7 @@ class ConfigurationTest extends TestCase
      *
      * @return array A normalized array
      */
-    protected function process($configs)
+    private function process(array $configs): array
     {
         $processor = new Processor();
 

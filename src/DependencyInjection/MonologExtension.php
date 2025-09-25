@@ -743,6 +743,7 @@ final class MonologExtension extends Extension
                     $handler['bubble'],
                 ]);
                 break;
+
             case 'newrelic':
                 $definition->setArguments([
                     $handler['level'],
@@ -750,6 +751,7 @@ final class MonologExtension extends Extension
                     $handler['app_name'],
                 ]);
                 break;
+
             case 'server_log':
                 $definition->setArguments([
                     $handler['host'],
@@ -757,6 +759,7 @@ final class MonologExtension extends Extension
                     $handler['bubble'],
                 ]);
                 break;
+
             case 'sampling':
                 $nestedHandlerId = $this->getHandlerId($handler['handler']);
                 $this->markNestedHandler($nestedHandlerId);

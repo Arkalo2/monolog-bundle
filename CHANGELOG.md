@@ -8,6 +8,8 @@
 * Add `slack.exclude_fields` and `slackwebhook.exclude_fields` configuration
 * Add a processor to all loggers only when tags do not specify a channel or handler
 * Deprecate abstract `monolog.activation_strategy.not_found` and `monolog.handler.fingers_crossed.error_level_activation_strategy` service definitions
+* Drop support for PHP < 8.1
+* Drop support for Symfony < 6.4
 
 ## 3.10.0 (2023-11-06)
 

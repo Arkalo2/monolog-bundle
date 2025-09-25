@@ -19,6 +19,9 @@ jobs:
                         deps: lowest
                         deprecations: max[self]=0
                     -   php: '8.4'
+                        symfony: '7.4.*'
+                        deps: highest
+                    -   php: '8.4'
                         deps: highest
 
         env:

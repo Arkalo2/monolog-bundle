@@ -44,7 +44,9 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
 
         ->set('monolog.activation_strategy.not_found', NotFoundActivationStrategy::class)->abstract()
+            ->deprecate('symfony/monolog-bundle', '3.11', 'The "%service_id%" service is deprecated.')
         ->set('monolog.handler.fingers_crossed.error_level_activation_strategy', ErrorLevelActivationStrategy::class)->abstract()
+            ->deprecate('symfony/monolog-bundle', '3.11', 'The "%service_id%" service is deprecated.')
 
         // Formatters
         ->set('monolog.formatter.chrome_php', ChromePHPFormatter::class)

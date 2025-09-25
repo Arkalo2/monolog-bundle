@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\MonologBundle\Tests\DependencyInjection;
 
 use Composer\InstalledVersions;
-use Monolog\Logger;
+use Monolog\Level;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
@@ -254,11 +254,11 @@ class ConfigurationTest extends TestCase
 
         $this->assertSame('console', $config['handlers']['console']['type']);
         $this->assertSame([
-            OutputInterface::VERBOSITY_NORMAL => Logger::NOTICE,
-            OutputInterface::VERBOSITY_VERBOSE => Logger::INFO,
+            OutputInterface::VERBOSITY_NORMAL => Level::Notice->value,
+            OutputInterface::VERBOSITY_VERBOSE => Level::Info->value,
             OutputInterface::VERBOSITY_VERY_VERBOSE => 200,
-            OutputInterface::VERBOSITY_QUIET => Logger::ERROR,
-            OutputInterface::VERBOSITY_DEBUG => Logger::DEBUG,
+            OutputInterface::VERBOSITY_QUIET => Level::Error->value,
+            OutputInterface::VERBOSITY_DEBUG => Level::Debug->value,
         ], $config['handlers']['console']['verbosity_levels']);
     }
 

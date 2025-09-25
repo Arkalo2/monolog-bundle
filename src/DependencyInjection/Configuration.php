@@ -125,7 +125,6 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
  * - fingers_crossed:
  *   - handler: the wrapped handler's name
  *   - [action_level|activation_strategy]: minimum level or service id to activate the handler, defaults to WARNING
- *   - [excluded_404s]: if set, the strategy will be changed to one that excludes 404s coming from URLs matching any of those patterns
  *   - [excluded_http_codes]: if set, the strategy will be changed to one that excludes specific HTTP codes (requires Symfony Monolog bridge 4.1+)
  *   - [buffer_size]: defaults to 0 (unlimited)
  *   - [stop_buffering]: bool to disable buffering once the handler has been activated, defaults to true
@@ -396,7 +395,6 @@ final class Configuration implements ConfigurationInterface
         $handlerNode = $handlers
             ->prototype('array')
                 ->fixXmlConfig('member')
-                ->fixXmlConfig('excluded_404')
                 ->fixXmlConfig('excluded_http_code')
                 ->fixXmlConfig('tag')
                 ->fixXmlConfig('accepted_level')
@@ -439,7 +437,7 @@ final class Configuration implements ConfigurationInterface
                     ->beforeNormalization()
                         ->ifString()
                         ->then(function ($v) {
-                            if ('0' === substr($v, 0, 1)) {
+                            if (str_starts_with($v, '0')) {
                                 return octdec($v);
                             }
 
@@ -458,10 +456,6 @@ final class Configuration implements ConfigurationInterface
                 ->scalarNode('activation_strategy')->defaultNull()->end() // fingers_crossed
                 ->booleanNode('stop_buffering')->defaultTrue()->end()// fingers_crossed
                 ->scalarNode('passthru_level')->defaultNull()->end() // fingers_crossed
-                ->arrayNode('excluded_404s') // fingers_crossed
-                    ->canBeUnset()
-                    ->prototype('scalar')->end()
-                ->end()
                 ->arrayNode('excluded_http_codes') // fingers_crossed
                     ->canBeUnset()
                     ->beforeNormalization()
@@ -574,15 +568,6 @@ final class Configuration implements ConfigurationInterface
                     ->prototype('scalar')->end()
                 ->end()
                  // console
-                ->variableNode('console_formater_options')
-                    ->setDeprecated('symfony/monolog-bundle', 3.7, '"%path%.%node%" is deprecated, use "%path%.console_formatter_options" instead.')
-                    ->validate()
-                        ->ifTrue(function ($v) {
-                            return !\is_array($v);
-                        })
-                        ->thenInvalid('The console_formater_options must be an array.')
-                    ->end()
-                ->end()
                 ->variableNode('console_formatter_options')
                     ->defaultValue([])
                     ->validate()
@@ -604,22 +589,6 @@ final class Configuration implements ConfigurationInterface
         $this->addChannelsSection($handlerNode);
 
         $handlerNode
-            ->beforeNormalization()
-                ->always(static function ($v) {
-                    if (empty($v['console_formatter_options']) && !empty($v['console_formater_options'])) {
-                        $v['console_formatter_options'] = $v['console_formater_options'];
-                    }
-
-                    return $v;
-                })
-            ->end()
-            ->validate()
-                ->always(static function ($v) {
-                    unset($v['console_formater_options']);
-
-                    return $v;
-                })
-            ->end()
             ->validate()
                 ->ifTrue(function ($v) { return 'service' === $v['type'] && !empty($v['formatter']); })
                 ->thenInvalid('Service handlers can not have a formatter configured in the bundle, you must reconfigure the service itself instead')
@@ -629,20 +598,12 @@ final class Configuration implements ConfigurationInterface
                 ->thenInvalid('The handler has to be specified to use a FingersCrossedHandler, BufferHandler, FilterHandler, DeduplicationHandler or SamplingHandler')
             ->end()
             ->validate()
-                ->ifTrue(function ($v) { return 'fingers_crossed' === $v['type'] && !empty($v['excluded_404s']) && !empty($v['activation_strategy']); })
-                ->thenInvalid('You can not use excluded_404s together with a custom activation_strategy in a FingersCrossedHandler')
-            ->end()
-            ->validate()
                 ->ifTrue(function ($v) { return 'fingers_crossed' === $v['type'] && !empty($v['excluded_http_codes']) && !empty($v['activation_strategy']); })
                 ->thenInvalid('You can not use excluded_http_codes together with a custom activation_strategy in a FingersCrossedHandler')
             ->end()
             ->validate()
-                ->ifTrue(function ($v) { return 'fingers_crossed' === $v['type'] && !empty($v['excluded_http_codes']) && !empty($v['excluded_404s']); })
-                ->thenInvalid('You can not use excluded_http_codes together with excluded_404s in a FingersCrossedHandler')
-            ->end()
-            ->validate()
-                ->ifTrue(function ($v) { return 'fingers_crossed' !== $v['type'] && (!empty($v['excluded_http_codes']) || !empty($v['excluded_404s'])); })
-                ->thenInvalid('You can only use excluded_http_codes/excluded_404s with a FingersCrossedHandler definition')
+                ->ifTrue(function ($v) { return 'fingers_crossed' !== $v['type'] && !empty($v['excluded_http_codes']); })
+                ->thenInvalid('You can only use excluded_http_codes with a FingersCrossedHandler definition')
             ->end()
             ->validate()
                 ->ifTrue(function ($v) { return 'filter' === $v['type'] && 'DEBUG' !== $v['min_level'] && !empty($v['accepted_levels']); })
@@ -848,9 +809,9 @@ final class Configuration implements ConfigurationInterface
                     ->thenInvalid('What must be set is either the host or the id.')
                     ->end()
                 ->end()
-                ->scalarNode('index')->defaultValue('monolog')->end() // elasticsearch & elastic_search & elastica
-                ->scalarNode('document_type')->defaultValue('logs')->end() // elasticsearch & elastic_search & elastica
-                ->scalarNode('ignore_error')->defaultValue(false)->end() // elasticsearch & elastic_search & elastica
+                ->scalarNode('index')->defaultValue('monolog')->end() // elastic_search & elastica
+                ->scalarNode('document_type')->defaultValue('logs')->end() // elastic_search & elastica
+                ->scalarNode('ignore_error')->defaultValue(false)->end() // elastic_search & elastica
             ->end()
         ;
     }
@@ -1043,7 +1004,7 @@ final class Configuration implements ConfigurationInterface
 
                             $elements = [];
                             foreach ($v['elements'] as $element) {
-                                if (0 === strpos($element, '!')) {
+                                if (str_starts_with($element, '!')) {
                                     if (false === $isExclusive) {
                                         throw new InvalidConfigurationException('Cannot combine exclusive/inclusive definitions in channels list.');
                                     }

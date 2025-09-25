@@ -21,10 +21,8 @@ use Monolog\Formatter\LogstashFormatter;
 use Monolog\Formatter\NormalizerFormatter;
 use Monolog\Formatter\ScalarFormatter;
 use Monolog\Formatter\WildfireFormatter;
-use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Monolog\Handler\FingersCrossed\NotFoundActivationStrategy;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -42,11 +40,6 @@ return static function (ContainerConfigurator $container) {
         ->set('monolog.logger_prototype', Logger::class)
             ->args([abstract_arg('channel')])
             ->abstract()
-
-        ->set('monolog.activation_strategy.not_found', NotFoundActivationStrategy::class)->abstract()
-            ->deprecate('symfony/monolog-bundle', '3.11', 'The "%service_id%" service is deprecated.')
-        ->set('monolog.handler.fingers_crossed.error_level_activation_strategy', ErrorLevelActivationStrategy::class)->abstract()
-            ->deprecate('symfony/monolog-bundle', '3.11', 'The "%service_id%" service is deprecated.')
 
         // Formatters
         ->set('monolog.formatter.chrome_php', ChromePHPFormatter::class)

@@ -10,6 +10,7 @@
 * Deprecate abstract `monolog.activation_strategy.not_found` and `monolog.handler.fingers_crossed.error_level_activation_strategy` service definitions
 * Drop support for PHP < 8.1
 * Drop support for Symfony < 6.4
+* Add TelegramBotHandler `topic` support
 
 ## 3.10.0 (2023-11-06)
 

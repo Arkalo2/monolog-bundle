@@ -221,6 +221,7 @@ class ConfigurationTest extends TestCase
                         'type' => 'telegram',
                         'token' => 'bot-token',
                         'channel' => '-100',
+                        'topic' => 1234,
                     ],
                 ],
             ],
@@ -230,6 +231,7 @@ class ConfigurationTest extends TestCase
 
         $this->assertEquals('bot-token', $config['handlers']['telegram']['token']);
         $this->assertEquals('-100', $config['handlers']['telegram']['channel']);
+        $this->assertEquals(1234, $config['handlers']['telegram']['topic']);
     }
 
     public function testWithConsoleHandler()

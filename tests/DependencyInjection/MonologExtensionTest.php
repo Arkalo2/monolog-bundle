@@ -507,7 +507,7 @@ class MonologExtensionTest extends DependencyInjectionTestCase
     }
 
     #[DataProvider('provideLoglevelParameterConfig')]
-    public function testLogLevelfromParameter(array $parameters, array $config, $expectedClass, array $expectedArgs)
+    public function testLogLevelfromParameter(array $parameters, array $config, string $expectedClass, array $expectedArgs)
     {
         $container = new ContainerBuilder();
         foreach ($parameters as $name => $value) {
@@ -601,7 +601,7 @@ class MonologExtensionTest extends DependencyInjectionTestCase
         $this->assertEquals('reset', $tags['kernel.reset'][0]['method']);
     }
 
-    public function testAsMonologProcessorAutoconfigurationRedeclareMethod(): void
+    public function testAsMonologProcessorAutoconfigurationRedeclareMethod()
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('AsMonologProcessor attribute cannot declare a method on "Symfony\Bundle\MonologBundle\Tests\DependencyInjection\Fixtures\AsMonologProcessor\RedeclareMethodProcessor::__invoke()".');
@@ -611,7 +611,7 @@ class MonologExtensionTest extends DependencyInjectionTestCase
         ]);
     }
 
-    public function testAsMonologProcessorAutoconfigurationWithPriority(): void
+    public function testAsMonologProcessorAutoconfigurationWithPriority()
     {
         $container = $this->getContainer([], [
             FooProcessorWithPriority::class => (new Definition(FooProcessorWithPriority::class))->setAutoconfigured(true),
@@ -633,7 +633,7 @@ class MonologExtensionTest extends DependencyInjectionTestCase
         ], $container->getDefinition(FooProcessorWithPriority::class)->getTag('monolog.processor'));
     }
 
-    public function testWithLoggerChannelAutoconfiguration(): void
+    public function testWithLoggerChannelAutoconfiguration()
     {
         $container = $this->getContainer([], [
             ServiceWithChannel::class => (new Definition(ServiceWithChannel::class))->setAutoconfigured(true),

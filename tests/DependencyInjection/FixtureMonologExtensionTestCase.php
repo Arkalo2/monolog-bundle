@@ -207,7 +207,7 @@ abstract class FixtureMonologExtensionTestCase extends DependencyInjectionTestCa
         $this->assertNotContainsEquals(['pushProcessor', [new Reference('monolog.processor.psr_log_message')]], $methodCalls, 'The PSR-3 processor should not be enabled');
     }
 
-    public function testPsrLogMessageProcessorHasConstructorArguments(): void
+    public function testPsrLogMessageProcessorHasConstructorArguments()
     {
         $container = $this->getContainer('process_psr_3_messages_with_arguments');
 
@@ -240,7 +240,7 @@ abstract class FixtureMonologExtensionTestCase extends DependencyInjectionTestCa
         $this->assertSame(['addHeader', [['Foo: bar', 'Baz: inga']]], $methodCalls[1]);
     }
 
-    protected function getContainer($fixture)
+    protected function getContainer($fixture): ContainerBuilder
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new MonologExtension());
@@ -255,5 +255,5 @@ abstract class FixtureMonologExtensionTestCase extends DependencyInjectionTestCa
         return $container;
     }
 
-    abstract protected function loadFixture(ContainerBuilder $container, $fixture);
+    abstract protected function loadFixture(ContainerBuilder $container, string $fixture);
 }

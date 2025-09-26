@@ -18,7 +18,6 @@ use Monolog\Handler\HandlerInterface;
 use Monolog\Processor\ProcessorInterface;
 use Monolog\Processor\PsrLogMessageProcessor;
 use Monolog\ResettableInterface;
-use Symfony\Bridge\Monolog\Processor\SwitchUserTokenProcessor;
 use Symfony\Bridge\Monolog\Processor\TokenProcessor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
@@ -364,10 +363,7 @@ final class MonologExtension extends Extension
                 $nestedHandlerId = $this->getHandlerId($handler['handler']);
                 $this->markNestedHandler($nestedHandlerId);
 
-                $activation = $handler['action_level'];
-                if (class_exists(SwitchUserTokenProcessor::class)) {
-                    $activation = new Definition(ErrorLevelActivationStrategy::class, [$activation]);
-                }
+                $activation = new Definition(ErrorLevelActivationStrategy::class, [$handler['action_level']]);
 
                 if (isset($handler['activation_strategy'])) {
                     $activation = new Reference($handler['activation_strategy']);

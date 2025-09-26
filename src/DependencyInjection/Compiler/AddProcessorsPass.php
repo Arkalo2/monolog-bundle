@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Christophe Coevoet <stof@notk.org>
  *
- * @internal since 3.9.0
+ * @internal
  */
 class AddProcessorsPass implements CompilerPassInterface
 {

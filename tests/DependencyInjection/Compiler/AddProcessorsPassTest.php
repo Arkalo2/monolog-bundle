@@ -111,7 +111,7 @@ class AddProcessorsPassTest extends TestCase
         ];
     }
 
-    protected function getContainer()
+    protected function getContainer(): ContainerBuilder
     {
         $container = new ContainerBuilder();
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../config'));

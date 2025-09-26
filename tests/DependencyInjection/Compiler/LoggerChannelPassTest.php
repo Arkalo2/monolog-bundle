@@ -144,7 +144,7 @@ class LoggerChannelPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    private function getContainer()
+    private function getContainer(): ContainerBuilder
     {
         $container = new ContainerBuilder();
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../config'));
@@ -186,7 +186,7 @@ class LoggerChannelPassTest extends TestCase
         return $container;
     }
 
-    private function getContainerWithSetter()
+    private function getContainerWithSetter(): ContainerBuilder
     {
         $container = new ContainerBuilder();
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../config'));
@@ -212,10 +212,7 @@ class LoggerChannelPassTest extends TestCase
         return $container;
     }
 
-    /**
-     * @return ContainerBuilder
-     */
-    private function getFunctionalContainer()
+    private function getFunctionalContainer(): ContainerBuilder
     {
         $container = new ContainerBuilder();
         $container->setParameter('monolog.additional_channels', []);

@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 
 class XmlMonologExtensionTest extends FixtureMonologExtensionTestCase
 {
-    protected function loadFixture(ContainerBuilder $container, $fixture)
+    protected function loadFixture(ContainerBuilder $container, string $fixture)
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/xml'));
         $loader->load($fixture.'.xml');

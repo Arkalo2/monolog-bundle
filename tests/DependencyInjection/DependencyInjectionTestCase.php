@@ -12,26 +12,24 @@
 namespace Symfony\Bundle\MonologBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Definition;
 
 abstract class DependencyInjectionTestCase extends TestCase
 {
     /**
      * Assertion on the Class of a DIC Service Definition.
-     *
-     * @param \Symfony\Component\DependencyInjection\Definition $definition
-     * @param string                                            $expectedClass
      */
-    protected function assertDICDefinitionClass($definition, $expectedClass)
+    protected function assertDICDefinitionClass(Definition $definition, string $expectedClass)
     {
         $this->assertEquals($expectedClass, $definition->getClass(), 'Expected Class of the DIC Container Service Definition is wrong.');
     }
 
-    protected function assertDICConstructorArguments($definition, $args)
+    protected function assertDICConstructorArguments(Definition $definition, array $args)
     {
         $this->assertEquals($args, $definition->getArguments(), "Expected and actual DIC Service constructor arguments of definition '".$definition->getClass()."' don't match.");
     }
 
-    protected function assertDICDefinitionMethodCallAt($pos, $definition, $methodName, ?array $params = null)
+    protected function assertDICDefinitionMethodCallAt(int $pos, Definition $definition, string $methodName, ?array $params = null)
     {
         $calls = $definition->getMethodCalls();
         if (isset($calls[$pos][0])) {
